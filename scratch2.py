@@ -1,9 +1,12 @@
-import numpy as np
+import multiprocessing as mp
 
-data = [
-    [1, 2, 3, 4, 5],
-    [2, 3, 4, 5, 6],
-    [3, 4, 5, 6, 7]
-]
+def foo(q):
+    q.put('hello')
 
-data = np.mean(data, axis=0)
+
+def run():
+    q = mp.Queue()
+    p = mp.Process(target=foo, args=(q,))
+    p.start()
+    print(q.get())
+    p.join()
