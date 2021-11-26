@@ -1,5 +1,5 @@
-from Resources.data_collection import run
+from Resources.data_collection import run, pickle_data
 import scratch2
 
 # scratch2.run()
-run()
+pickle_data()

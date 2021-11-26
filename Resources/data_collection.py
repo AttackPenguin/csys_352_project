@@ -3,6 +3,7 @@ from __future__ import annotations
 import concurrent
 import copy
 import os
+import pickle
 import time
 from concurrent.futures import ThreadPoolExecutor
 from itertools import product
@@ -48,10 +49,37 @@ def run():
 
 
 def pickle_data():
-
     n = 50
-    k = list(range(50))
+    k_vals = list(range(50))
+    max_gene_value = 100
+    exploit_explore_ratios = [0.05*x for x in range(1, 21)]
 
+    for k in k_vals:
+        print(f"Running k = {k}...")
+        data = {ratio: dict() for ratio in exploit_explore_ratios}
+        for ratio in exploit_explore_ratios:
+            print(f"\tRunning ratio = {ratio}...")
+            fitnesses, solutions, generations = run_solution_set(
+                landscape=dl.Landscape,
+                ls_kwargs={
+                    'n': n,
+                    'k': k,
+                    'max_gene_val': max_gene_value
+                },
+                find_solution=dl.find_solution,
+                fs_kwargs={
+                    'generations': 2000,
+                    'exploit_explore': ratio
+                },
+                iterations=100,
+                num_processes=15
+            )
+            data[ratio]['fitnesses'] = fitnesses
+            data[ratio]['solutions'] = solutions
+            data[ratio]['generations'] = generations
+        destination = f"Pickled Data/discrete_sim_data_k_{k}.pickle"
+        with open(destination, 'wb') as file:
+            pickle.dump(data, file)
 
 
 def find_solution_wrapper(q: Queue,
@@ -70,7 +98,6 @@ def run_solution_set(landscape: dl.Landscape | cl.Landscape,
                      fs_kwargs: dict[str, Any],
                      iterations: int,
                      num_processes: int = 10):
-
     fitnesses = list()
     solutions = list()
     generations = list()
@@ -104,6 +131,6 @@ def run_solution_set(landscape: dl.Landscape | cl.Landscape,
         for process in processes:
             process.join()
         completed += len(processes)
-        print(f"{completed} iterations completed...")
+        # print(f"{completed} iterations completed...")
 
     return fitnesses, solutions, generations
