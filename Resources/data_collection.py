@@ -50,7 +50,7 @@ def run():
 
 def pickle_data():
     n = 50
-    k_vals = list(range(50))
+    k_vals = list(range(40, 50))
     max_gene_value = 100
     exploit_explore_ratios = [0.05*x for x in range(1, 21)]
 
@@ -72,7 +72,7 @@ def pickle_data():
                     'exploit_explore': ratio
                 },
                 iterations=100,
-                num_processes=15
+                num_processes=3
             )
             data[ratio]['fitnesses'] = fitnesses
             data[ratio]['solutions'] = solutions
